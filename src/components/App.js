@@ -7,21 +7,35 @@ import '../style.css'
 
 class App extends Component {
   state = {
-    notes: {}
+    notes: {},
+    formNote: {
+      title: "",
+      text: "",
+      image: "",
+      visible: true
+    }
   }
   
   componentWillMount(){
-    const localStorageRef = localStorage.getItem('savedInfo')
+    const localStorageNotesRef = localStorage.getItem('savedNotes')
+    const localStorageFormRef = localStorage.getItem('savedForm')
 
-    if(localStorageRef){
+    if(localStorageNotesRef){
       this.setState({
-        notes: JSON.parse(localStorageRef)
+        notes: JSON.parse(localStorageNotesRef)
+      })
+    }
+
+    if(localStorageNotesRef){
+      this.setState({
+        formNote: JSON.parse(localStorageFormRef)
       })
     }
   }
 
   componentWillUpdate(nextProps, nextState){
-    localStorage.setItem('savedInfo', JSON.stringify(nextState.notes))
+    localStorage.setItem('savedNotes', JSON.stringify(nextState.notes))
+    localStorage.setItem('savedForm', JSON.stringify(nextState.formNote))
   }
 
   componentDidMount(){
@@ -48,8 +62,14 @@ class App extends Component {
   }
 
   editNote = (key) => {
-    console.log(key)
-    console.log(this.state.notes[key])
+    this.changeFormState(this.state.notes[key])
+    this.removeNote(key)
+  }
+
+  changeFormState = (note) => {
+    this.setState({
+      formNote: note
+    })
   }
 
   searchNote = (text) => {
@@ -70,7 +90,7 @@ class App extends Component {
       <div id="entry">
         <Navbar searchNote={this.searchNote} loadSamples={this.loadSamples} />
         <div className="container">
-          <AddNote addNote={this.addNote} />
+          <AddNote addNote={this.addNote} formNote={this.state.formNote} changeFormState={this.changeFormState} />
           <div className="row">
             <div className="col-lg">
               <div className="card-columns">
